@@ -20,31 +20,25 @@ public class Sw_maintenance {
      */
     public static void main(String[] args) throws SQLException {
         testingClass u = new testingClass("DBTest", "root", "");
-        u.setid(2);
-        u.setnn("testing");
+        u.setid(1);
+        u.setnn("Hello ");
         u.setFlNumber(10.95f);
-        u.setFlag(false);
-        u.setC('o');
+        u.setFlag(true);
+        u.setC('T');
         u.setLl(125647855);
         u.setD(4.46);
-//        
-        
-        
-        
+              
         u.openConnection();
-        
-        
+          
         DBSet<testingClass> u1 = u.getDBInstance(testingClass.class);
-
         u1.add(u);
-
+  
+        ArrayList<testingClass> arr = u1.findBy("id", 1);
         
-        ArrayList<testingClass> arr = u.getDBInstance(testingClass.class).findBy("id", 1);
+        testingClass object = (testingClass)u1.findById("id", 3);
         
-        testingClass object = (testingClass)u.getDBInstance(testingClass.class).findById("id", 1);
-        
-        ArrayList<testingClass> arr2 = u.getDBInstance(testingClass.class).findAll();
-        System.out.println("Array size " + arr.size());
+        ArrayList<testingClass> arr2 = u1.findAll();
+        //System.out.println("Array size " + arr.size());
         
         System.out.println("");
         System.out.println("");
@@ -79,7 +73,7 @@ public class Sw_maintenance {
         
         System.out.println("");
         System.out.println("");
-        System.out.println("findby function which returns object");
+        System.out.println("findby function which returns object when id 3");
         if(object != null){
             printData(object);
         }else{
@@ -104,7 +98,7 @@ public class Sw_maintenance {
         long ll = u.getLl();
         float f = u.getFlNumber();
         double d = u.getD();
-        System.out.println("text is " + s + " number is " + jj + " charcater is " + cc + " boolean is " + bb + " double number is " + d + " float number is " + f);
+        System.out.println("text is: " + s + " number is: " + jj + " charcater is: " + cc + " boolean is: " + bb + " double number is: " + d + " float number is: " + f);
     }
 
 }

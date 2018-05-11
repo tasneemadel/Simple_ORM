@@ -70,7 +70,8 @@ public class DBSet<T> {
         }catch(Exception e){
         }
     }*/
-    //Will be implemented by team 0
+    
+    //insert the whole object
     public void add(T item) {
         String insert = "INSERT INTO " + classType.getSimpleName() + "(";
         for (int i = 0; i < fields.length; i++) {
@@ -128,159 +129,95 @@ public class DBSet<T> {
             System.out.println(e.getMessage());
         }
     }
-    //New- added by team 1
+    //Execute retrieve code to fetch data from database
+   public ArrayList<T> retrieve(String query)throws SQLException{
+   ArrayList<T> arrayObject = new ArrayList<>();
+        try {
+            ResultSet rs = databaseEntity.excuteQUERY(query);
+            String resultname = rs.getClass().getName();
+            String className = classType.getName();// Class name
+            Class<?> cls = Class.forName(className);
+            Class<?> rls = rs.getClass();
+            while (rs.next()) {
+                Object _instance = cls.newInstance();
+                for (int i = 0; i < fields.length; i++) {
+                    //get Java Types eg. Int, Float 
+                    String type = getJavaType(fields[i].getType().toString());
+                    //get field name
+                    String fieldName = fields[i].getName();
+                    //concatenate get string with type of given field to form get functions of ResultSet class
+                    String methoName = "get" + type;
+                    //get method of abstract class ResultSet by passing the method name and its paramaters' type
+                    Method myMethod = ResultSet.class.getDeclaredMethod(methoName, String.class);
+                    //Invoke the given method of ResultSet class by passing reference of this abstract class and 
+                    //the field name 
+                    result = myMethod.invoke(rs, fieldName);
+                    //Make the private field be accessible y setting it true
+                    fields[i].setAccessible(true);
+                    //pass the instaniated instance of the given class eg.user and the result of the method invokation
+                    //to set this field by the new value of this instance of the given class => setting an attribute of user class
+//                    fields[i].set(_instance, result);
+                    if (flag == 1) {
+                        fields[i].set(_instance, result.toString().charAt(0));
+                        flag = 0;
+                    } else {
+                        fields[i].set(_instance, result);
+                    }
 
-    public ArrayList<T> findAll() throws SQLException {
+                }
+                //insert the object of the given class in the arraylist after setting all its attributes
+                arrayObject.add((T) _instance);
+            }
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+
+        return arrayObject;
+   }
+   //return array list of objects of given class
+      public ArrayList<T> findAll() throws SQLException {
         //The returned array list 
         ArrayList<T> arrayObject = new ArrayList<>();
         //Query to select all the information of given class
         String query = "SELECT * FROM " + classType.getSimpleName() + " ;";
         try {
-            //The rows of database are returned in ResultSet reference    
-            ResultSet rs = databaseEntity.excuteQUERY(query);
-            //Get the full name of ResultSet Class
-            String resultname = rs.getClass().getName();
-            //Get the Full name of given class
-            String className = classType.getName();
-            //get the given class 
-            Class<?> cls = Class.forName(className);
-            //Loop over the returned rows from database 
-            while (rs.next()) {
-                //make new instance from the given class to set its attributes and return it to the user.
-                Object _instance = cls.newInstance();
-                //Loop over the fields of the given class
-                for (int i = 0; i < fields.length; i++) {
-                    //get Java Types eg. Int, Float 
-                    String type = getJavaType(fields[i].getType().toString());
-                    //get field name
-                    String fieldName = fields[i].getName();
-                    //concatenate get string with type of given field to form get functions of ResultSet class
-                    String methoName = "get" + type;
-                    //get method of abstract class ResultSet by passing the method name and its paramaters' type
-                    Method myMethod = ResultSet.class.getDeclaredMethod(methoName, String.class);
-                    //Invoke the given method of ResultSet class by passing reference of this abstract class and 
-                    //the field name 
-                    result = myMethod.invoke(rs, fieldName);
-                    //Make the private field be accessible y setting it true
-                    fields[i].setAccessible(true);
-                    //pass the instaniated instance of the given class eg.user and the result of the method invokation
-                    //to set this field by the new value of this instance of the given class => setting an attribute of user class
-//                    fields[i].set(_instance, result);
-                    if (flag == 1) {
-                        fields[i].set(_instance, result.toString().charAt(0));
-                        flag = 0;
-                    } else {
-                        fields[i].set(_instance, result);
-                    }
-                }
-                //insert the object of the given class in the arraylist after setting all its attributes
-                arrayObject.add((T) _instance);
+            arrayObject=retrieve(query);
             }
-        } catch (Exception e) {
+         catch (Exception e) {
             System.out.println(e);
         }
         return arrayObject;
     }
-    //New- added by team 1
-
+      //retrieve all data from database that satisify certain condition
     public ArrayList<T> findBy(String field, Object value) throws SQLException {
 
         ArrayList<T> arrayObject = new ArrayList<>();
         String query = "SELECT * FROM " + classType.getSimpleName() + " WHERE " + field + "='" + value.toString() + "';";
         try {
-            ResultSet rs = databaseEntity.excuteQUERY(query);
-            String resultname = rs.getClass().getName();
-            String className = classType.getName();// Class name
-            Class<?> cls = Class.forName(className);
-            Class<?> rls = rs.getClass();
-            while (rs.next()) {
-                Object _instance = cls.newInstance();
-                for (int i = 0; i < fields.length; i++) {
-                    //get Java Types eg. Int, Float 
-                    String type = getJavaType(fields[i].getType().toString());
-                    //get field name
-                    String fieldName = fields[i].getName();
-                    //concatenate get string with type of given field to form get functions of ResultSet class
-                    String methoName = "get" + type;
-                    //get method of abstract class ResultSet by passing the method name and its paramaters' type
-                    Method myMethod = ResultSet.class.getDeclaredMethod(methoName, String.class);
-                    //Invoke the given method of ResultSet class by passing reference of this abstract class and 
-                    //the field name 
-                    result = myMethod.invoke(rs, fieldName);
-                    //Make the private field be accessible y setting it true
-                    fields[i].setAccessible(true);
-                    //pass the instaniated instance of the given class eg.user and the result of the method invokation
-                    //to set this field by the new value of this instance of the given class => setting an attribute of user class
-//                    fields[i].set(_instance, result);
-                    if (flag == 1) {
-                        fields[i].set(_instance, result.toString().charAt(0));
-                        flag = 0;
-                    } else {
-                        fields[i].set(_instance, result);
-                    }
-
-                }
-                //insert the object of the given class in the arraylist after setting all its attributes
-                arrayObject.add((T) _instance);
+            arrayObject=retrieve(query);
             }
-        } catch (Exception e) {
+         catch (Exception e) {
             System.out.println(e);
         }
 
         return arrayObject;
     }
 
-    //Will be implemented by team 1
-    //Will be implemented by team 1
+    //get object of the given class
     public T findById(String field, Object value) {
 
         T arrayObject = null;
         String query = "SELECT * FROM " + classType.getSimpleName() + " WHERE " + field + "='" + value.toString() + "';";
         try {
-            ResultSet rs = databaseEntity.excuteQUERY(query);
-            String resultname = rs.getClass().getName();
-            String className = classType.getName();// Class name
-            Class<?> cls = Class.forName(className);
-            Class<?> rls = rs.getClass();
-            while (rs.next()) {
-                Object _instance = cls.newInstance();
-                for (int i = 0; i < fields.length; i++) {
-                    //get Java Types eg. Int, Float 
-                    String type = getJavaType(fields[i].getType().toString());
-                    //get field name
-                    String fieldName = fields[i].getName();
-                    //concatenate get string with type of given field to form get functions of ResultSet class
-                    String methoName = "get" + type;
-                    //get method of abstract class ResultSet by passing the method name and its paramaters' type
-                    Method myMethod = ResultSet.class.getDeclaredMethod(methoName, String.class);
-                    //Invoke the given method of ResultSet class by passing reference of this abstract class and 
-                    //the field name 
-                    result = myMethod.invoke(rs, fieldName);
-                    //Make the private field be accessible y setting it true
-                    fields[i].setAccessible(true);
-                    //pass the instaniated instance of the given class eg.user and the result of the method invokation
-                    //to set this field by the new value of this instance of the given class => setting an attribute of user class
-//                    fields[i].set(_instance, result);
-
-                    if (flag == 1) {
-                        fields[i].set(_instance, result.toString().charAt(0));
-                        flag = 0;
-                    } else {
-                        fields[i].set(_instance, result);
-                    }
-                }
-                //insert the object of the given class in the arraylist after setting all its attributes
-
-                arrayObject = ((T) _instance);
-                return arrayObject;
+            arrayObject=retrieve(query).get(0);
             }
-        } catch (Exception e) {
+         catch (Exception e) {
             System.out.println(e);
         }
 
         return arrayObject;
     }
-
+//create table
     private void createTable() throws SQLException {
         String create = "CREATE TABLE " + classType.getSimpleName() + " (";
 
@@ -301,7 +238,7 @@ public class DBSet<T> {
 
         databaseEntity.excuteSql(create);
     }
-
+//map java types to database types
     private String getSqlType(String type) {
         switch (type) {
             case "class java.lang.String":
@@ -323,7 +260,7 @@ public class DBSet<T> {
         }
     }
 
-    //New added by team 1
+    //map the java types to names of ResultSet methods 
     private String getJavaType(String type) {
         switch (type) {
             case "class java.lang.String":
