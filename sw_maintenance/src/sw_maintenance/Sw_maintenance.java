@@ -19,7 +19,7 @@ public class Sw_maintenance {
      * @param args the command line arguments
      */
     public static void main(String[] args) throws SQLException {
-        testingClass u = new testingClass("mysql", "root", "Manosazzz1271995");
+        testingClass u = new testingClass("DBTest", "root", "");
         u.setid(2);
         u.setnn("testing");
         u.setFlNumber(10.95f);
