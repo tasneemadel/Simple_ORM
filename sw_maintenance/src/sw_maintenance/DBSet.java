@@ -68,8 +68,40 @@ public  class DBSet<T> {
     }*/
     
     //Will be implemented by team 0
-    public void add(T item){
+   public void add(T item){
         
+        String insert = "INSERT INTO "+ classType.getSimpleName()+"(";
+        for (int i=0;i<fields.length;i++){
+            String temp;
+            if(i!= fields.length - 1)
+                temp = fields[i].getName()+", ";
+            else
+                temp = fields[i].getName()+")";
+            insert += temp;
+        }
+        insert += "VALUES (";
+        for (int i=0;i<fields.length;i++){
+            fields[i].setAccessible(true);
+            String temp;
+            try{
+                
+                if(i!= fields.length - 1){
+                    
+                    temp = "'"+fields[i].get(item)+"', ";}
+                else{
+                    temp = "'"+fields[i].get(item)+"');";}
+                insert += temp;
+            }catch(IllegalAccessException e){
+                System.out.println(e.getMessage());
+            }catch(IllegalArgumentException e){
+                System.out.println(e.getMessage());
+            }
+        }
+        try{
+            databaseEntity.excuteSql(insert);
+        }catch(SQLException e){
+            System.out.println(e.getMessage());
+        }
     }
       //New- added by team 1
    public ArrayList<T> findAll() throws SQLException{
